@@ -1,5 +1,14 @@
 const TRIPS_KEY = 'wander_ai_trips'
 
+function uuid() {
+  // Use native crypto when available (browser + Node ≥ 19), otherwise fallback
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID()
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
+  })
+}
+
 /**
  * Load all saved trips from localStorage.
  * @returns {Array}
@@ -32,7 +41,7 @@ export function saveTrips(trips) {
  */
 export function addTrip(trip) {
   const trips = loadTrips()
-  const updated = [{ ...trip, id: crypto.randomUUID(), savedAt: new Date().toISOString() }, ...trips]
+  const updated = [{ ...trip, id: uuid(), savedAt: new Date().toISOString() }, ...trips]
   saveTrips(updated)
   return updated
 }

@@ -1,6 +1,5 @@
 import { loadTrips, saveTrips, addTrip, deleteTrip } from '../utils/storage'
 
-// jsdom provides a basic localStorage stub
 beforeEach(() => localStorage.clear())
 
 describe('loadTrips', () => {
@@ -43,8 +42,6 @@ describe('addTrip', () => {
 
 describe('deleteTrip', () => {
   it('removes the trip with the matching id', () => {
-    const [trip] = addTrip({ destination: 'Rome' })
-    // addTrip returns array, trip is first element
     const trips = addTrip({ destination: 'Rome' })
     const id = trips[0].id
     const after = deleteTrip(id)

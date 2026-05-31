@@ -2,14 +2,21 @@ import { useState, useEffect } from 'react'
 
 export function useDarkMode() {
   const [dark, setDark] = useState(() => {
-    const stored = localStorage.getItem('wander_ai_dark')
-    if (stored !== null) return stored === 'true'
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
+    try {
+      const stored = localStorage.getItem('tripcraft_dark')
+      if (stored !== null) return stored === 'true'
+    } catch {}
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
   })
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark)
-    localStorage.setItem('wander_ai_dark', dark)
+    const root = document.documentElement
+    if (dark) {
+      root.classList.add('dark')
+    } else {
+      root.classList.remove('dark')
+    }
+    try { localStorage.setItem('tripcraft_dark', String(dark)) } catch {}
   }, [dark])
 
   return [dark, setDark]

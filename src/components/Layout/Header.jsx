@@ -16,10 +16,10 @@ export default function Header({ dark, onToggleDark }) {
         <NavLink
           to="/"
           className="flex items-center gap-2 text-xl font-bold text-brand-700 dark:text-brand-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 rounded"
-          aria-label="WanderAI home"
+          aria-label="TripCraft home"
         >
           <span aria-hidden="true">✈️</span>
-          WanderAI
+          TripCraft
         </NavLink>
 
         <a

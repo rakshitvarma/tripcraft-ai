@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
 
 const FEATURES = [
-  { icon: '🤖', title: 'AI Itineraries',  desc: 'Gemini 1.5 Flash builds a day-by-day plan tailored to your style and budget.' },
+  { icon: '🤖', title: 'AI Itineraries',  desc: 'Gemini 2.5 Flash builds a day-by-day plan tailored to your style and budget.' },
   { icon: '⛅', title: 'Live Weather',    desc: 'Real-time conditions for your destination appear as you type.' },
   { icon: '💾', title: 'Save & Revisit',  desc: 'Itineraries are stored locally — access them any time, no account needed.' },
-  { icon: '♿', title: 'Accessible',      desc: 'Full keyboard navigation, screen-reader labels, and WCAG-compliant contrast.' },
+  { icon: '🌍', title: 'Multi-Currency',  desc: 'Plan in USD, EUR, INR, GBP and 6 more — all costs shown in your currency.' },
 ]
 
 export default function Home() {
@@ -13,11 +13,11 @@ export default function Home() {
       {/* Hero */}
       <section className="text-center" aria-labelledby="hero-heading">
         <p className="text-5xl mb-6" aria-hidden="true">✈️</p>
-        <h1 id="hero-heading" className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+        <h1 id="hero-heading" className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50 sm:text-5xl">
           Your AI Travel Companion
         </h1>
-        <p className="mt-5 mx-auto max-w-2xl text-lg text-slate-600 leading-relaxed">
-          Tell WanderAI where you want to go and we'll generate a personalised itinerary
+        <p className="mt-5 mx-auto max-w-2xl text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+          Tell TripCraft where you want to go and we'll generate a personalised itinerary
           — complete with activities, budget breakdown, packing list, and live weather.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -37,8 +37,8 @@ export default function Home() {
           {FEATURES.map(({ icon, title, desc }) => (
             <li key={title} className="card text-center">
               <span className="text-4xl" aria-hidden="true">{icon}</span>
-              <h3 className="mt-3 font-semibold text-slate-900">{title}</h3>
-              <p className="mt-1.5 text-sm text-slate-500 leading-relaxed">{desc}</p>
+              <h3 className="mt-3 font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
+              <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</p>
             </li>
           ))}
         </ul>

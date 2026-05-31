@@ -39,8 +39,8 @@ export default function Trips() {
     <div className="mx-auto max-w-5xl px-4 py-12">
       <header className="mb-8 flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">My Trips</h1>
-          <p className="mt-1 text-slate-500">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">My Trips</h1>
+          <p className="mt-1 text-slate-500 dark:text-slate-400">
             {trips.length} saved {trips.length === 1 ? 'trip' : 'trips'}
           </p>
         </div>

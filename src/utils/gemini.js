@@ -49,23 +49,40 @@ Required shape:
 }`
 }
 
+function extractJSON(text) {
+  if (!text) return null
+
+  // Strategy 1: direct parse
+  try { return JSON.parse(text.trim()) } catch {}
+
+  // Strategy 2: strip markdown fences then parse
+  const stripped = text
+    .replace(/^```(?:json)?\s*/im, '')
+    .replace(/\s*```\s*$/im, '')
+    .trim()
+  try { return JSON.parse(stripped) } catch {}
+
+  // Strategy 3: find outermost { } block
+  const start = text.indexOf('{')
+  const end   = text.lastIndexOf('}')
+  if (start !== -1 && end > start) {
+    try { return JSON.parse(text.slice(start, end + 1)) } catch {}
+  }
+
+  return null
+}
+
 export async function generateItinerary(prefs) {
   const key = import.meta.env.VITE_GEMINI_API_KEY
   if (!key) throw new Error('Gemini API key not configured')
 
-  const body = {
-    contents: [{ parts: [{ text: buildItineraryPrompt(prefs) }] }],
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 8192,
-      responseMimeType: 'application/json',
-    },
-  }
-
   const res = await fetch(`${GEMINI_URL}?key=${key}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: buildItineraryPrompt(prefs) }] }],
+      generationConfig: { temperature: 0.7, maxOutputTokens: 8192 },
+    }),
   })
 
   if (!res.ok) {
@@ -75,29 +92,15 @@ export async function generateItinerary(prefs) {
 
   const data = await res.json()
 
-  // Collect all non-thought text parts (handles thinking model multi-part responses)
+  // Collect text from every part regardless of role/thought flag
   const parts = data?.candidates?.[0]?.content?.parts ?? []
-  const raw = parts
-    .filter((p) => !p.thought)
-    .map((p) => p.text ?? '')
-    .join('')
-    .trim()
+  const allText = parts.map((p) => p.text ?? '').join('\n').trim()
 
-  if (!raw) throw new Error('Gemini returned an empty response — please try again')
+  console.debug('[TripCraft] Raw Gemini response:', allText.slice(0, 500))
 
-  // Strip markdown fences if still present despite responseMimeType
-  const jsonText = raw
-    .replace(/^```(?:json)?\s*/i, '')
-    .replace(/\s*```$/i, '')
-    .trim()
+  const parsed = extractJSON(allText)
+  if (parsed) return parsed
 
-  // Extract the first complete JSON object in case of leading/trailing prose
-  const match = jsonText.match(/\{[\s\S]*\}/)
-  if (!match) throw new Error('No valid JSON found in AI response — please try again')
-
-  try {
-    return JSON.parse(match[0])
-  } catch {
-    throw new Error('AI returned malformed JSON — please try again')
-  }
+  // Surface the raw text in the error so we can see what came back
+  throw new Error(`Could not parse AI response. Raw: ${allText.slice(0, 200)}`)
 }

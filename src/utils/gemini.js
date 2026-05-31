@@ -81,7 +81,7 @@ export async function generateItinerary(prefs) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ text: buildItineraryPrompt(prefs) }] }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 8192 },
+      generationConfig: { temperature: 0.7, maxOutputTokens: 65536 },
     }),
   })
 

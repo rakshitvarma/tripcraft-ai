@@ -2,7 +2,6 @@ import { useState, lazy, Suspense, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StyleSelector from './StyleSelector'
 import BudgetSlider from './BudgetSlider'
-import LocationInput from './LocationInput'
 import { useWeather } from '../../hooks/useWeather'
 import { nightsBetween } from '../../utils/formatters'
 
@@ -30,7 +29,9 @@ export default function TripForm() {
   const [errors, setErrors] = useState({})
   const navigate = useNavigate()
 
-  const { weather, loading: wLoading, error: wError } = useWeather(form.destination)
+  // Use only the city name (before first comma) for weather lookup
+  const weatherCity = form.destination.split(',')[0].trim()
+  const { weather, loading: wLoading, error: wError } = useWeather(weatherCity)
   const nights = nightsBetween(form.startDate, form.endDate)
 
   const set = useCallback((field, value) => {

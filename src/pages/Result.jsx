@@ -34,7 +34,8 @@ export default function Result() {
   const [saved, setSaved] = useState(false)
   const [prefs, setPrefs] = useState(null)
 
-  const { weather, loading: wLoading, error: wError } = useWeather(prefs?.destination ?? '')
+  const weatherCity = (prefs?.destination ?? '').split(',')[0].trim()
+  const { weather, loading: wLoading, error: wError } = useWeather(weatherCity)
 
   useEffect(() => {
     const raw = sessionStorage.getItem('tripPrefs')

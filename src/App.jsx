@@ -23,7 +23,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-200">
+      <div className="flex min-h-screen flex-col transition-colors duration-200">
         <Header dark={dark} onToggleDark={() => setDark(d => !d)} />
         <main id="main-content" className="flex-1">
           <ErrorBoundary>

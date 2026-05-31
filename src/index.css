@@ -11,14 +11,16 @@
     @apply font-sans antialiased;
   }
 
-  /* Light default */
+  /* Light default — warm off-white background */
   :root {
-    @apply bg-slate-50 text-slate-900;
+    @apply text-slate-900;
+    background-color: #f5f0eb;
   }
 
-  /* Dark override on html element (Tailwind class strategy) */
+  /* Dark override — improved contrast */
   html.dark {
-    @apply bg-slate-900 text-slate-100;
+    background-color: #0f172a;
+    color: #e2e8f0;
   }
 
   *:focus-visible {
@@ -47,7 +49,7 @@
   }
 
   .card {
-    @apply bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6;
+    @apply bg-white dark:bg-slate-800/80 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6;
   }
 
   .input-base {

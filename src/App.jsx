@@ -2,8 +2,8 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Header from './components/Layout/Header'
 import Footer from './components/Layout/Footer'
+import { useDarkMode } from './hooks/useDarkMode'
 
-// Lazy-load pages for code-splitting
 const Home   = lazy(() => import('./pages/Home'))
 const Plan   = lazy(() => import('./pages/Plan'))
 const Result = lazy(() => import('./pages/Result'))
@@ -18,10 +18,12 @@ function PageLoader() {
 }
 
 export default function App() {
+  const [dark, setDark] = useDarkMode()
+
   return (
     <BrowserRouter>
-      <div className="flex min-h-screen flex-col">
-        <Header />
+      <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-200">
+        <Header dark={dark} onToggleDark={() => setDark(d => !d)} />
         <main id="main-content" className="flex-1">
           <Suspense fallback={<PageLoader />}>
             <Routes>

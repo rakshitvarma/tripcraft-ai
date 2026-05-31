@@ -4,6 +4,7 @@ import StyleSelector from './StyleSelector'
 import BudgetSlider from './BudgetSlider'
 import { useWeather } from '../../hooks/useWeather'
 import WeatherWidget from '../Weather/WeatherWidget'
+import { nightsBetween } from '../../utils/formatters'
 
 const today = new Date().toISOString().split('T')[0]
 
@@ -18,20 +19,16 @@ const INITIAL = {
 
 function FieldError({ msg }) {
   if (!msg) return null
-  return <p className="mt-1 text-xs text-red-600" role="alert">{msg}</p>
+  return <p className="mt-1 text-xs text-red-500 dark:text-red-400" role="alert">{msg}</p>
 }
 
-/**
- * Core trip preference form.  On submit, stashes prefs in sessionStorage and
- * navigates to /result where generation occurs — keeping the form page clean.
- */
 export default function TripForm() {
   const [form, setForm] = useState(INITIAL)
   const [errors, setErrors] = useState({})
   const navigate = useNavigate()
 
-  // Live weather preview as the user types a destination
   const { weather, loading: wLoading, error: wError } = useWeather(form.destination)
+  const nights = nightsBetween(form.startDate, form.endDate)
 
   function set(field, value) {
     setForm((f) => ({ ...f, [field]: value }))
@@ -53,9 +50,7 @@ export default function TripForm() {
     const errs = validate()
     if (Object.keys(errs).length) {
       setErrors(errs)
-      // Move focus to the first error field for accessibility
-      const firstKey = Object.keys(errs)[0]
-      document.getElementById(firstKey)?.focus()
+      document.getElementById(Object.keys(errs)[0])?.focus()
       return
     }
     sessionStorage.setItem('tripPrefs', JSON.stringify(form))
@@ -63,32 +58,25 @@ export default function TripForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      aria-label="Trip preference form"
-      className="space-y-6"
-    >
+    <form onSubmit={handleSubmit} noValidate aria-label="Trip preference form" className="space-y-6">
+
       {/* Destination */}
       <div>
-        <label htmlFor="destination" className="label-base">
+        <label htmlFor="destination" className="label-base dark:text-slate-300">
           Destination <span aria-hidden="true" className="text-red-500">*</span>
         </label>
         <input
           id="destination"
           type="text"
-          className="input-base"
+          className="input-base dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
           placeholder="e.g. Tokyo, Japan"
           value={form.destination}
           onChange={(e) => set('destination', e.target.value)}
           autoComplete="off"
           aria-required="true"
-          aria-describedby={errors.destination ? 'destination-error' : undefined}
           aria-invalid={!!errors.destination}
         />
         <FieldError msg={errors.destination} />
-
-        {/* Inline weather preview */}
         {(weather || wLoading || wError) && (
           <div className="mt-3">
             <WeatherWidget weather={weather} loading={wLoading} error={wError} compact />
@@ -97,39 +85,50 @@ export default function TripForm() {
       </div>
 
       {/* Dates */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="startDate" className="label-base">
-            Arrival Date <span aria-hidden="true" className="text-red-500">*</span>
-          </label>
-          <input
-            id="startDate"
-            type="date"
-            className="input-base"
-            value={form.startDate}
-            min={today}
-            onChange={(e) => set('startDate', e.target.value)}
-            aria-required="true"
-            aria-invalid={!!errors.startDate}
-          />
-          <FieldError msg={errors.startDate} />
+      <div>
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="label-base dark:text-slate-300 mb-0">
+            When are you going? <span aria-hidden="true" className="text-red-500">*</span>
+          </span>
+          {nights > 0 && (
+            <span className="rounded-full bg-brand-50 dark:bg-brand-900/40 px-3 py-0.5 text-xs font-semibold text-brand-700 dark:text-brand-400">
+              {nights} night{nights > 1 ? 's' : ''}
+            </span>
+          )}
         </div>
-
-        <div>
-          <label htmlFor="endDate" className="label-base">
-            Departure Date <span aria-hidden="true" className="text-red-500">*</span>
-          </label>
-          <input
-            id="endDate"
-            type="date"
-            className="input-base"
-            value={form.endDate}
-            min={form.startDate || today}
-            onChange={(e) => set('endDate', e.target.value)}
-            aria-required="true"
-            aria-invalid={!!errors.endDate}
-          />
-          <FieldError msg={errors.endDate} />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label htmlFor="startDate" className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
+              Start date
+            </label>
+            <input
+              id="startDate"
+              type="date"
+              className="input-base dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100"
+              value={form.startDate}
+              min={today}
+              onChange={(e) => set('startDate', e.target.value)}
+              aria-required="true"
+              aria-invalid={!!errors.startDate}
+            />
+            <FieldError msg={errors.startDate} />
+          </div>
+          <div>
+            <label htmlFor="endDate" className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
+              End date
+            </label>
+            <input
+              id="endDate"
+              type="date"
+              className="input-base dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100"
+              value={form.endDate}
+              min={form.startDate || today}
+              onChange={(e) => set('endDate', e.target.value)}
+              aria-required="true"
+              aria-invalid={!!errors.endDate}
+            />
+            <FieldError msg={errors.endDate} />
+          </div>
         </div>
       </div>
 
@@ -141,13 +140,13 @@ export default function TripForm() {
 
       {/* Constraints */}
       <div>
-        <label htmlFor="constraints" className="label-base">
+        <label htmlFor="constraints" className="label-base dark:text-slate-300">
           Special Requirements{' '}
           <span className="font-normal text-slate-400">(optional)</span>
         </label>
         <textarea
           id="constraints"
-          className="input-base resize-none"
+          className="input-base resize-none dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
           rows={3}
           placeholder="Dietary restrictions, mobility needs, must-see spots, things to avoid…"
           value={form.constraints}

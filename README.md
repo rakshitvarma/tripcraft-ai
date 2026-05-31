@@ -74,27 +74,6 @@ src/
 
 ---
 
-## AI Reliability
-
-Gemini 2.5 Flash with thinking mode can return non-JSON preamble. TripCraft AI handles this with:
-
-- `responseMimeType: 'application/json'` — forces pure JSON output
-- Thinking parts filtered via `!p.thought`
-- 3-strategy JSON extractor (direct parse → strip markdown → repair truncated)
-- Automatic retry loop (up to 3 attempts) before surfacing an error
-
----
-
-## Security
-
-- Passcodes are **never stored in plaintext** — only salted SHA-256 hashes
-- Salt = `username:passcode` to prevent rainbow table attacks
-- Sessions stored in `sessionStorage` — cleared on tab close
-- Each user's trips stored under `tripcraft_trips_{hash}` — fully isolated
-- API keys loaded exclusively via `import.meta.env` — never committed
-
----
-
 ## Running Locally
 
 ```bash

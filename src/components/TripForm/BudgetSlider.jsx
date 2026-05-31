@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { formatBudget } from '../../utils/formatters'
 
-const MIN = 200
-const MAX = 20_000
+const SLIDER_MIN = 200
+const SLIDER_MAX = 20_000
 const STEP = 100
 
 export const CURRENCIES = [
@@ -17,19 +18,32 @@ export const CURRENCIES = [
   { code: 'CHF', label: 'CHF – Swiss Franc',       symbol: 'Fr' },
 ]
 
-/**
- * @param {{ value: number, onChange: (n: number) => void, currency: string, onCurrencyChange: (c: string) => void }} props
- */
 export default function BudgetSlider({ value, onChange, currency, onCurrencyChange }) {
-  const pct = ((value - MIN) / (MAX - MIN)) * 100
+  // Raw string for the custom input so users can type freely
+  const [inputVal, setInputVal] = useState(String(value))
+  const [customMode, setCustomMode] = useState(false)
+
+  const pct = Math.min(100, ((value - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100)
+
+  function commitCustom(raw) {
+    const n = parseInt(raw.replace(/\D/g, ''), 10)
+    if (!isNaN(n) && n >= 1) {
+      onChange(n)
+      setInputVal(String(n))
+    } else {
+      setInputVal(String(value))
+    }
+  }
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-1.5 gap-3 flex-wrap">
+      {/* Header row */}
+      <div className="flex items-center justify-between mb-2 gap-3 flex-wrap">
         <label htmlFor="budget-slider" className="label-base mb-0 dark:text-slate-300">
           Total Budget
         </label>
-        <div className="flex items-center gap-2">
+
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Currency picker */}
           <select
             value={currency}
@@ -44,39 +58,71 @@ export default function BudgetSlider({ value, onChange, currency, onCurrencyChan
             ))}
           </select>
 
-          <span
-            className="rounded-full bg-brand-50 dark:bg-brand-900/40 px-3 py-0.5 text-sm font-semibold text-brand-700 dark:text-brand-400"
-            aria-live="polite"
-            aria-label={`Budget: ${formatBudget(value, currency)}`}
+          {/* Toggle between slider and custom input */}
+          <button
+            type="button"
+            onClick={() => {
+              setCustomMode((m) => !m)
+              setInputVal(String(value))
+            }}
+            className="text-xs text-brand-600 dark:text-brand-400 underline underline-offset-2 hover:text-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500 rounded"
+            aria-label={customMode ? 'Switch to slider' : 'Enter custom amount'}
           >
-            {formatBudget(value, currency)}
-          </span>
+            {customMode ? 'Use slider' : 'Custom amount'}
+          </button>
         </div>
       </div>
 
-      <input
-        id="budget-slider"
-        type="range"
-        min={MIN}
-        max={MAX}
-        step={STEP}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-2 appearance-none rounded-full bg-slate-200 dark:bg-slate-700 cursor-pointer
-                   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4
-                   [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full
-                   [&::-webkit-slider-thumb]:bg-brand-600"
-        style={{ background: `linear-gradient(to right, #2563eb ${pct}%, ${pct}%)` }}
-        aria-valuemin={MIN}
-        aria-valuemax={MAX}
-        aria-valuenow={value}
-        aria-valuetext={formatBudget(value, currency)}
-      />
-
-      <div className="flex justify-between text-xs text-slate-400 mt-1">
-        <span>{formatBudget(MIN, currency)}</span>
-        <span>{formatBudget(MAX, currency)}</span>
-      </div>
+      {customMode ? (
+        /* Free-text input for any budget */
+        <div className="relative">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400 dark:text-slate-500 pointer-events-none">
+            {CURRENCIES.find(c => c.code === currency)?.symbol ?? currency}
+          </span>
+          <input
+            type="number"
+            min={1}
+            value={inputVal}
+            onChange={(e) => setInputVal(e.target.value)}
+            onBlur={(e) => commitCustom(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && commitCustom(inputVal)}
+            placeholder="Enter any amount"
+            className="input-base pl-8"
+            aria-label={`Custom budget in ${currency}`}
+          />
+        </div>
+      ) : (
+        /* Slider capped at 20 000 */
+        <>
+          <input
+            id="budget-slider"
+            type="range"
+            min={SLIDER_MIN}
+            max={SLIDER_MAX}
+            step={STEP}
+            value={Math.min(value, SLIDER_MAX)}
+            onChange={(e) => {
+              const n = Number(e.target.value)
+              onChange(n)
+              setInputVal(String(n))
+            }}
+            className="w-full h-2 appearance-none rounded-full bg-slate-200 dark:bg-slate-700 cursor-pointer
+                       [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4
+                       [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full
+                       [&::-webkit-slider-thumb]:bg-brand-600"
+            style={{ background: `linear-gradient(to right, #2563eb ${pct}%, transparent ${pct}%)` }}
+            aria-valuemin={SLIDER_MIN}
+            aria-valuemax={SLIDER_MAX}
+            aria-valuenow={value}
+            aria-valuetext={formatBudget(value, currency)}
+          />
+          <div className="flex justify-between text-xs text-slate-400 mt-1">
+            <span>{formatBudget(SLIDER_MIN, currency)}</span>
+            <span className="font-semibold text-brand-600 dark:text-brand-400">{formatBudget(value, currency)}</span>
+            <span>{formatBudget(SLIDER_MAX, currency)}</span>
+          </div>
+        </>
+      )}
     </div>
   )
 }

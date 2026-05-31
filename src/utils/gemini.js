@@ -58,10 +58,8 @@ export async function generateItinerary(prefs) {
     generationConfig: {
       temperature: 0.7,
       maxOutputTokens: 8192,
-      responseMimeType: 'application/json',  // force JSON-only response
+      responseMimeType: 'application/json',
     },
-    // Disable thinking so the response is direct text, not thought+text parts
-    thinkingConfig: { thinkingBudget: 0 },
   }
 
   const res = await fetch(`${GEMINI_URL}?key=${key}`, {

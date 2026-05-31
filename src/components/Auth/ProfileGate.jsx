@@ -93,7 +93,7 @@ export default function ProfileGate({ onAuth, dark, onToggleDark }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Logo size={28} />
-            <span className="text-xl font-extrabold gradient-text">TripCraft</span>
+            <span className="text-xl font-extrabold gradient-text">TripCraft AI</span>
           </div>
           <button
             type="button"
@@ -129,7 +129,7 @@ export default function ProfileGate({ onAuth, dark, onToggleDark }) {
           </h1>
 
           <p className="text-slate-500 dark:text-slate-400 text-base leading-relaxed max-w-md mb-10">
-            Tell TripCraft where you're going and we'll build a complete itinerary —
+            Tell TripCraft AI where you're going and we'll build a complete itinerary —
             activities, budget, weather, packing list and emergency contacts.
           </p>
 
@@ -178,7 +178,7 @@ export default function ProfileGate({ onAuth, dark, onToggleDark }) {
 
         {/* Bottom */}
         <p className="text-xs text-slate-400 dark:text-slate-600">
-          © {new Date().getFullYear()} TripCraft · Powered by Google AI &amp; OpenWeatherMap
+          © {new Date().getFullYear()} TripCraft AI · Powered by Google AI &amp; OpenWeatherMap
         </p>
       </div>
 
@@ -191,7 +191,7 @@ export default function ProfileGate({ onAuth, dark, onToggleDark }) {
         {/* Mobile logo */}
         <div className="lg:hidden flex items-center gap-2 mb-8">
           <Logo size={26} />
-          <span className="text-xl font-extrabold gradient-text">TripCraft</span>
+          <span className="text-xl font-extrabold gradient-text">TripCraft AI</span>
         </div>
 
         <div className="w-full max-w-sm">
@@ -214,7 +214,7 @@ export default function ProfileGate({ onAuth, dark, onToggleDark }) {
                 id="pg-username"
                 type="text"
                 className="input-base"
-                placeholder="e.g. rakshit"
+                placeholder=""
                 value={username}
                 onChange={(e) => { setUsername(e.target.value); setError('') }}
                 autoComplete="username"
@@ -234,7 +234,7 @@ export default function ProfileGate({ onAuth, dark, onToggleDark }) {
                   id="pg-passcode"
                   type={showPass ? 'text' : 'password'}
                   className="input-base pr-10"
-                  placeholder="e.g. Travel42x"
+                  placeholder=""
                   value={passcode}
                   onChange={(e) => { setPasscode(e.target.value); setError('') }}
                   autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}

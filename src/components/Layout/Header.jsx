@@ -18,10 +18,10 @@ export default function Header({ dark, onToggleDark, session, onLogout }) {
         <NavLink
           to="/"
           className="flex items-center gap-2 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 group"
-          aria-label="TripCraft home"
+          aria-label="TripCraft AI home"
         >
           <Logo size={26} className="group-hover:scale-110 transition-transform duration-200 drop-shadow-sm" />
-          <span className="text-lg font-extrabold tracking-tight gradient-text">TripCraft</span>
+          <span className="text-lg font-extrabold tracking-tight gradient-text">TripCraft AI</span>
         </NavLink>
 
         <a

@@ -8,7 +8,7 @@ export default function Footer() {
         {/* Brand */}
         <NavLink to="/" className="flex items-center gap-2 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500">
           <Logo size={22} />
-          <span className="text-sm font-extrabold tracking-tight gradient-text">TripCraft</span>
+          <span className="text-sm font-extrabold tracking-tight gradient-text">TripCraft AI</span>
         </NavLink>
 
         {/* Links */}

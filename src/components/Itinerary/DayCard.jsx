@@ -12,7 +12,7 @@ const TYPE_COLOR = {
 /**
  * @param {{ day: object, defaultOpen?: boolean }} props
  */
-export default function DayCard({ day, defaultOpen = false }) {
+export default function DayCard({ day, defaultOpen = false, currency = 'USD' }) {
   const [open, setOpen] = useState(defaultOpen)
 
   return (
@@ -62,9 +62,9 @@ export default function DayCard({ day, defaultOpen = false }) {
                     )}
                   </div>
                   <p className="text-sm text-slate-600">{act.description}</p>
-                  {act.estimatedCostUSD > 0 && (
+                  {(act.estimatedCost ?? act.estimatedCostUSD) > 0 && (
                     <p className="mt-1 text-xs text-slate-400">
-                      ~${act.estimatedCostUSD} USD
+                      ~{new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(act.estimatedCost ?? act.estimatedCostUSD)}
                     </p>
                   )}
                 </div>

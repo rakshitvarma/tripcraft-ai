@@ -83,7 +83,7 @@ export default function Result() {
           {/* Weather for destination */}
           <WeatherWidget weather={weather} loading={wLoading} error={wError} />
 
-          <ItineraryView itinerary={itinerary} onSave={handleSave} saved={saved} />
+          <ItineraryView itinerary={itinerary} onSave={handleSave} saved={saved} currency={prefs?.currency ?? 'USD'} />
         </div>
       )}
     </div>

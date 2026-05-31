@@ -29,6 +29,7 @@ export default function Trips() {
           }}
           onSave={() => {}}
           saved
+          currency={viewing.currency ?? 'USD'}
         />
       </div>
     )

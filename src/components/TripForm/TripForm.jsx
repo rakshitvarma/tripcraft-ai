@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StyleSelector from './StyleSelector'
 import BudgetSlider from './BudgetSlider'
+import { CURRENCIES } from './BudgetSlider'
 import { useWeather } from '../../hooks/useWeather'
 import WeatherWidget from '../Weather/WeatherWidget'
 import { nightsBetween } from '../../utils/formatters'
@@ -13,6 +14,7 @@ const INITIAL = {
   startDate:    '',
   endDate:      '',
   budget:       3000,
+  currency:     'USD',
   travelStyle:  'cultural',
   constraints:  '',
 }
@@ -133,7 +135,12 @@ export default function TripForm() {
       </div>
 
       {/* Budget */}
-      <BudgetSlider value={form.budget} onChange={(v) => set('budget', v)} />
+      <BudgetSlider
+        value={form.budget}
+        onChange={(v) => set('budget', v)}
+        currency={form.currency}
+        onCurrencyChange={(c) => set('currency', c)}
+      />
 
       {/* Travel style */}
       <StyleSelector value={form.travelStyle} onChange={(v) => set('travelStyle', v)} />

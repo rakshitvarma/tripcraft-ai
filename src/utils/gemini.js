@@ -7,7 +7,7 @@ const GEMINI_URL =
  * @returns {string}
  */
 export function buildItineraryPrompt(prefs) {
-  const { destination, startDate, endDate, budget, travelStyle, constraints } = prefs
+  const { destination, startDate, endDate, budget, currency = 'USD', travelStyle, constraints } = prefs
   const nights = Math.max(
     1,
     Math.round((new Date(endDate) - new Date(startDate)) / 86_400_000),
@@ -18,7 +18,7 @@ export function buildItineraryPrompt(prefs) {
 Trip details:
 - Destination: ${destination}
 - Duration: ${nights} night(s), arriving ${startDate}, departing ${endDate}
-- Budget: ${budget} USD total
+- Budget: ${budget} ${currency} total (use ${currency} for all costs)
 - Travel style: ${travelStyle}
 - Constraints / notes: ${constraints || 'none'}
 
@@ -36,7 +36,7 @@ Return ONLY a JSON object with this exact shape (no markdown, no explanation):
           "time": "HH:MM",
           "title": "Activity name",
           "description": "2-3 sentences",
-          "estimatedCostUSD": 0,
+          "estimatedCost": 0,
           "type": "food|sightseeing|transport|accommodation|leisure"
         }
       ],

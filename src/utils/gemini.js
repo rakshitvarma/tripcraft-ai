@@ -12,7 +12,7 @@ export function buildItineraryPrompt(prefs) {
 Trip:
 - Destination: ${destination}
 - Dates: ${startDate} to ${endDate} (${cappedNights} days)
-- Budget: ${budget} ${currency} total
+- Budget: ${budget} ${currency} total (excludes international/intercity travel tickets — cover only local transport, accommodation, food, activities, and misc)
 - Style: ${travelStyle}
 - Notes: ${constraints || 'none'}
 

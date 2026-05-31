@@ -1,5 +1,4 @@
-/** localStorage key for persisted trips. */
-const TRIPS_KEY = 'tripcraft_trips'
+import { tripsKey } from './auth'
 
 /**
  * Cross-environment UUID generator.
@@ -17,13 +16,27 @@ function uuid() {
 }
 
 /**
- * Load all saved trips from localStorage.
- * Returns an empty array on parse failure or missing data.
+ * Get the current user hash from sessionStorage.
+ * Falls back to a shared anonymous key if no session exists.
+ * @returns {string}
+ */
+function currentKey() {
+  try {
+    const raw = sessionStorage.getItem('tripcraft_session')
+    const session = raw ? JSON.parse(raw) : null
+    return session?.hash ? tripsKey(session.hash) : 'tripcraft_trips'
+  } catch {
+    return 'tripcraft_trips'
+  }
+}
+
+/**
+ * Load all saved trips for the current user.
  * @returns {object[]}
  */
 export function loadTrips() {
   try {
-    const raw = localStorage.getItem(TRIPS_KEY)
+    const raw = localStorage.getItem(currentKey())
     return raw ? JSON.parse(raw) : []
   } catch {
     return []
@@ -31,13 +44,12 @@ export function loadTrips() {
 }
 
 /**
- * Persist the full trips array to localStorage.
- * Fails silently on storage-quota errors so the UI remains functional.
+ * Persist the full trips array for the current user.
  * @param {object[]} trips
  */
 export function saveTrips(trips) {
   try {
-    localStorage.setItem(TRIPS_KEY, JSON.stringify(trips))
+    localStorage.setItem(currentKey(), JSON.stringify(trips))
   } catch {
     // Quota exceeded — in-memory state is still consistent
   }
@@ -50,14 +62,13 @@ export function saveTrips(trips) {
  */
 export function addTrip(trip) {
   const existing = loadTrips()
-  const updated = [{ ...trip, id: uuid(), savedAt: new Date().toISOString() }, ...existing]
+  const updated  = [{ ...trip, id: uuid(), savedAt: new Date().toISOString() }, ...existing]
   saveTrips(updated)
   return updated
 }
 
 /**
  * Remove the trip matching `id` and persist.
- * No-op if the id is not found.
  * @param {string} id
  * @returns {object[]} Updated trips list
  */

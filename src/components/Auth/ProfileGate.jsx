@@ -1,57 +1,66 @@
 import { useState, useCallback } from 'react'
 import { createProfile, loginProfile, saveSession, loadProfiles } from '../../utils/auth'
+import Logo from '../Logo'
 
 const PASSCODE_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$/
 
+const FEATURES = [
+  { icon: '🤖', label: 'AI Itineraries',  desc: 'Google AI builds your full day-by-day plan instantly.' },
+  { icon: '⛅', label: 'Live Weather',    desc: 'Real-time conditions as you plan — no surprises.' },
+  { icon: '💰', label: 'Budget Planner',  desc: 'Multi-currency breakdown across food, stays & activities.' },
+  { icon: '🔒', label: 'Private Trips',   desc: 'Passcode-protected. Your trips, only yours.' },
+]
+
+const ITINERARY_PREVIEW = [
+  { time: 'Morning',   title: 'Senso-ji Temple',        type: 'sightseeing', cost: '¥0'    },
+  { time: 'Afternoon', title: 'Shibuya Crossing',       type: 'leisure',     cost: '¥500'  },
+  { time: 'Evening',   title: 'Ramen at Ichiran',       type: 'food',        cost: '¥1,200'},
+]
+
+const TYPE_COLOR = {
+  sightseeing: 'bg-blue-500/20 text-blue-400 border-blue-500/20',
+  leisure:     'bg-pink-500/20 text-pink-400 border-pink-500/20',
+  food:        'bg-orange-500/20 text-orange-400 border-orange-500/20',
+}
+
 function StrengthBar({ passcode }) {
-  let strength = 0
-  if (passcode.length >= 6) strength++
-  if (/[A-Z]/.test(passcode)) strength++
-  if (/[0-9]/.test(passcode)) strength++
-  if (/[@$!%*#?&]/.test(passcode)) strength++
-
-  const colors = ['bg-red-400', 'bg-orange-400', 'bg-yellow-400', 'bg-emerald-500']
+  let s = 0
+  if (passcode.length >= 6) s++
+  if (/[A-Z]/.test(passcode)) s++
+  if (/[0-9]/.test(passcode)) s++
+  if (/[@$!%*#?&]/.test(passcode)) s++
+  const colors = ['bg-red-500', 'bg-orange-400', 'bg-yellow-400', 'bg-emerald-500']
   const labels = ['Weak', 'Fair', 'Good', 'Strong']
-
   if (!passcode) return null
-
   return (
     <div className="mt-1.5 flex items-center gap-2">
       <div className="flex gap-1 flex-1">
-        {[0, 1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className={`h-1 flex-1 rounded-full transition-all duration-300 ${i < strength ? colors[strength - 1] : 'bg-slate-200 dark:bg-slate-700'}`}
-          />
+        {[0,1,2,3].map(i => (
+          <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-300 ${i < s ? colors[s-1] : 'bg-white/10'}`} />
         ))}
       </div>
-      <span className="text-xs text-slate-500 dark:text-slate-400 w-12">{labels[strength - 1] ?? ''}</span>
+      <span className="text-xs text-slate-500 w-10 text-right">{labels[s-1] ?? ''}</span>
     </div>
   )
 }
 
-export default function ProfileGate({ onAuth }) {
-  const [mode, setMode] = useState('login') // 'login' | 'signup'
+export default function ProfileGate({ onAuth, dark, onToggleDark }) {
+  const [mode, setMode]       = useState(() => loadProfiles().length > 0 ? 'login' : 'signup')
   const [username, setUsername] = useState('')
   const [passcode, setPasscode] = useState('')
   const [showPass, setShowPass] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
-
-  const hasExistingProfiles = loadProfiles().length > 0
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
     setError('')
-
     if (!username.trim()) { setError('Please enter a username.'); return }
-    if (!passcode) { setError('Please enter a passcode.'); return }
-
+    if (!passcode)        { setError('Please enter a passcode.'); return }
     if (mode === 'signup' && !PASSCODE_REGEX.test(passcode)) {
-      setError('Passcode must be at least 6 characters and include both letters and numbers.')
+      setError('Passcode must be at least 6 characters with letters and numbers.')
       return
     }
-
     setLoading(true)
     try {
       const session = mode === 'signup'
@@ -67,39 +76,137 @@ export default function ProfileGate({ onAuth }) {
   }, [mode, username, passcode, onAuth])
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-12">
-      {/* Decorative blobs */}
+    <div className="relative flex min-h-screen overflow-hidden">
+
+      {/* ── Animated background orbs ── */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-gradient-to-r from-brand-400/20 via-violet-400/20 to-accent-400/10 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-gradient-to-tl from-pink-400/15 to-violet-400/15 blur-3xl" />
+        <div className="absolute -top-32 -left-32 h-[500px] w-[500px] rounded-full bg-brand-500/20 blur-3xl animate-float" />
+        <div className="absolute top-1/2 left-1/3 h-[400px] w-[400px] rounded-full bg-violet-500/15 blur-3xl animate-float-slow" />
+        <div className="absolute bottom-0 right-0 h-[450px] w-[450px] rounded-full bg-accent-500/15 blur-3xl animate-float-delay" />
+        <div className="absolute inset-0 dot-grid-light dark:dot-grid" />
       </div>
 
-      <div className="relative w-full max-w-md">
-        {/* Logo */}
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <defs>
-                <linearGradient id="lgGate" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#6366f1"/>
-                  <stop offset="50%" stopColor="#8b5cf6"/>
-                  <stop offset="100%" stopColor="#f43f5e"/>
-                </linearGradient>
-              </defs>
-              <path d="M28 12.5L20 16l-6-8-2 1 3 8.5L9 19l-2-2.5-1.5.5 1.5 4.5L8.5 26l1.5-.5-.5-3 2.5-1.5 5.5 7 2-1-1-9L26 14l2-1.5z" fill="url(#lgGate)"/>
-            </svg>
-            <span className="text-2xl font-extrabold gradient-text">TripCraft</span>
+      {/* ── LEFT — Hero / App Info ── */}
+      <div className="relative hidden lg:flex flex-col justify-between flex-1 px-16 py-12 max-w-[58%]">
+
+        {/* Top bar */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Logo size={28} />
+            <span className="text-xl font-extrabold gradient-text">TripCraft</span>
           </div>
-          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">
-            {mode === 'login' ? 'Welcome back' : 'Create your profile'}
-          </h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            {mode === 'login' ? 'Sign in to access your saved trips.' : 'Your trips are stored privately under your passcode.'}
-          </p>
+          <button
+            type="button"
+            onClick={onToggleDark}
+            aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            className="rounded-lg p-2 text-slate-400 dark:text-slate-500 hover:bg-white/10 transition-colors"
+          >
+            {dark ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
+          </button>
         </div>
 
-        <div className="card-glass p-8">
-          <form onSubmit={handleSubmit} noValidate className="space-y-5">
+        {/* Hero text */}
+        <div className="my-auto">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-400/30 bg-brand-500/10 px-4 py-1.5 text-xs font-semibold text-brand-400">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-500" />
+            </span>
+            AI Travel Planner · Free to use
+          </div>
+
+          <h1 className="text-5xl font-extrabold tracking-tight leading-[1.08] text-slate-900 dark:text-white mb-5">
+            Your trip, planned<br />
+            <span className="gradient-text">by AI. In seconds.</span>
+          </h1>
+
+          <p className="text-slate-500 dark:text-slate-400 text-base leading-relaxed max-w-md mb-10">
+            Tell TripCraft where you're going and we'll build a complete itinerary —
+            activities, budget, weather, packing list and emergency contacts.
+          </p>
+
+          {/* Feature list */}
+          <div className="grid grid-cols-2 gap-3 mb-12">
+            {FEATURES.map(({ icon, label, desc }) => (
+              <div key={label} className="flex items-start gap-3 rounded-xl border border-slate-200/60 dark:border-white/8 bg-white/40 dark:bg-white/[0.03] backdrop-blur-sm px-4 py-3">
+                <span className="text-xl mt-0.5" aria-hidden="true">{icon}</span>
+                <div>
+                  <p className="text-sm font-semibold text-slate-800 dark:text-white">{label}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-500 mt-0.5 leading-snug">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Animated itinerary preview card */}
+          <div className="rounded-2xl border border-slate-200/60 dark:border-white/8 bg-white/50 dark:bg-white/[0.04] backdrop-blur-md p-5 max-w-md">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-xs font-mono text-slate-400 dark:text-slate-500 mb-0.5">Sample itinerary</p>
+                <p className="font-bold text-slate-900 dark:text-white text-sm">Tokyo, Japan · Day 1</p>
+              </div>
+              <span className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-500">AI Generated</span>
+            </div>
+            <div className="space-y-2.5">
+              {ITINERARY_PREVIEW.map(({ time, title, type, cost }, i) => (
+                <div
+                  key={title}
+                  className="flex items-center gap-3 rounded-xl bg-white/60 dark:bg-white/[0.04] border border-slate-100 dark:border-white/5 px-3 py-2.5 animate-fade-up"
+                  style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'both' }}
+                >
+                  <span className="text-xs font-mono text-slate-400 dark:text-slate-600 w-16 shrink-0">{time}</span>
+                  <span className="flex-1 text-sm font-medium text-slate-800 dark:text-slate-200 truncate">{title}</span>
+                  <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${TYPE_COLOR[type]}`}>{type}</span>
+                  <span className="text-xs font-mono text-slate-500 dark:text-slate-500 shrink-0">{cost}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
+              <span className="text-xs text-slate-400 dark:text-slate-600">Budget breakdown · Packing list · Emergency contacts</span>
+              <span className="text-xs font-mono text-brand-400">+6 more days →</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom */}
+        <p className="text-xs text-slate-400 dark:text-slate-600">
+          © {new Date().getFullYear()} TripCraft · Powered by Google AI &amp; OpenWeatherMap
+        </p>
+      </div>
+
+      {/* ── Divider ── */}
+      <div className="hidden lg:block w-px bg-slate-200/60 dark:bg-white/[0.06] my-0" aria-hidden="true" />
+
+      {/* ── RIGHT — Auth form ── */}
+      <div className="relative flex flex-1 flex-col items-center justify-center px-6 py-12 lg:max-w-[42%]">
+
+        {/* Mobile logo */}
+        <div className="lg:hidden flex items-center gap-2 mb-8">
+          <Logo size={26} />
+          <span className="text-xl font-extrabold gradient-text">TripCraft</span>
+        </div>
+
+        <div className="w-full max-w-sm">
+          <div className="mb-8">
+            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">
+              {mode === 'login' ? 'Welcome back' : 'Get started free'}
+            </h2>
+            <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
+              {mode === 'login'
+                ? 'Sign in to access your private saved trips.'
+                : 'Create a profile — your trips stay private under your passcode.'}
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             {/* Username */}
             <div>
               <label htmlFor="pg-username" className="label-base">Username</label>
@@ -120,9 +227,7 @@ export default function ProfileGate({ onAuth }) {
             <div>
               <label htmlFor="pg-passcode" className="label-base">
                 Passcode
-                {mode === 'signup' && (
-                  <span className="ml-1 font-normal text-slate-400 text-xs">(letters + numbers, min 6 chars)</span>
-                )}
+                {mode === 'signup' && <span className="ml-1 font-normal text-slate-400 text-xs">· min 6 chars, letters + numbers</span>}
               </label>
               <div className="relative">
                 <input
@@ -136,7 +241,7 @@ export default function ProfileGate({ onAuth }) {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPass((v) => !v)}
+                  onClick={() => setShowPass(v => !v)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                   aria-label={showPass ? 'Hide passcode' : 'Show passcode'}
                 >
@@ -157,12 +262,12 @@ export default function ProfileGate({ onAuth }) {
 
             {/* Error */}
             {error && (
-              <p className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 px-4 py-2.5 text-sm text-red-600 dark:text-red-400" role="alert">
+              <p className="rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 px-4 py-2.5 text-sm text-red-600 dark:text-red-400" role="alert">
                 {error}
               </p>
             )}
 
-            <button type="submit" className="btn-primary w-full py-3" disabled={loading}>
+            <button type="submit" className="btn-primary w-full py-3 text-base" disabled={loading}>
               {loading ? (
                 <span className="flex items-center gap-2">
                   <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -171,31 +276,32 @@ export default function ProfileGate({ onAuth }) {
                   </svg>
                   {mode === 'signup' ? 'Creating profile…' : 'Signing in…'}
                 </span>
-              ) : mode === 'signup' ? 'Create Profile' : 'Sign In'}
+              ) : mode === 'signup' ? 'Create Profile →' : 'Sign In →'}
             </button>
           </form>
 
-          {/* Toggle mode */}
-          <p className="mt-5 text-center text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-5 text-center text-sm text-slate-500 dark:text-slate-500">
             {mode === 'login' ? (
               <>No profile yet?{' '}
-                <button type="button" onClick={() => { setMode('signup'); setError('') }} className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                <button type="button" onClick={() => { setMode('signup'); setError('') }} className="font-semibold text-brand-500 dark:text-brand-400 hover:underline">
                   Create one
                 </button>
               </>
             ) : (
               <>Already have a profile?{' '}
-                <button type="button" onClick={() => { setMode('login'); setError('') }} className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                <button type="button" onClick={() => { setMode('login'); setError('') }} className="font-semibold text-brand-500 dark:text-brand-400 hover:underline">
                   Sign in
                 </button>
               </>
             )}
           </p>
 
-          {/* Security note */}
-          <p className="mt-4 text-center text-xs text-slate-400 dark:text-slate-500">
-            🔒 Passcodes are hashed with SHA-256 and never stored in plaintext.
-          </p>
+          <div className="mt-8 rounded-xl border border-slate-200/60 dark:border-white/8 bg-white/40 dark:bg-white/[0.03] px-4 py-3 flex items-center gap-3">
+            <span className="text-lg" aria-hidden="true">🔒</span>
+            <p className="text-xs text-slate-500 dark:text-slate-500 leading-snug">
+              Passcodes are hashed with <span className="font-semibold text-slate-700 dark:text-slate-400">SHA-256</span> and never stored in plaintext. Your trips are fully private.
+            </p>
+          </div>
         </div>
       </div>
     </div>

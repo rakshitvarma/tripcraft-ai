@@ -15,9 +15,9 @@ const Trips  = lazy(() => import('./pages/Trips'))
 function PageLoader() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center" role="status" aria-label="Loading page">
-      <div className="relative">
-        <div className="h-12 w-12 rounded-full border-4 border-brand-200 border-t-brand-600 animate-spin" />
-        <div className="absolute inset-0 h-12 w-12 rounded-full border-4 border-transparent border-b-violet-500 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }} />
+      <div className="relative h-10 w-10">
+        <div className="absolute inset-0 rounded-full border-2 border-brand-500/20 border-t-brand-500 animate-spin" />
+        <div className="absolute inset-1 rounded-full border-2 border-violet-500/20 border-b-violet-500 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.6s' }} />
       </div>
     </div>
   )
@@ -27,34 +27,32 @@ export default function App() {
   const [dark, setDark] = useDarkMode()
   const [session, setSession] = useState(loadSession)
 
-  const handleAuth = useCallback((s) => setSession(s), [])
+  const handleAuth   = useCallback((s) => setSession(s), [])
+  const handleLogout = useCallback(() => { clearSession(); setSession(null) }, [])
 
-  const handleLogout = useCallback(() => {
-    clearSession()
-    setSession(null)
-  }, [])
+  const bgClass = dark ? 'bg-mesh-dark' : 'bg-mesh'
 
   if (!session) {
     return (
-      <div className={`flex min-h-screen flex-col transition-colors duration-300 bg-mesh${dark ? '-dark' : ''}`}>
-        <ProfileGate onAuth={handleAuth} />
+      <div className={`min-h-screen transition-colors duration-300 ${bgClass}`}>
+        <ProfileGate onAuth={handleAuth} dark={dark} onToggleDark={() => setDark(d => !d)} />
       </div>
     )
   }
 
   return (
     <BrowserRouter>
-      <div className={`flex min-h-screen flex-col transition-colors duration-300 bg-mesh${dark ? '-dark' : ''}`}>
+      <div className={`flex min-h-screen flex-col transition-colors duration-300 ${bgClass}`}>
         <Header dark={dark} onToggleDark={() => setDark(d => !d)} session={session} onLogout={handleLogout} />
         <main id="main-content" className="flex-1">
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
               <Routes>
-                <Route path="/"        element={<Home />} />
-                <Route path="/plan"    element={<Plan />} />
-                <Route path="/result"  element={<Result />} />
-                <Route path="/trips"   element={<Trips />} />
-                <Route path="*"        element={<Navigate to="/" replace />} />
+                <Route path="/"       element={<Home />} />
+                <Route path="/plan"   element={<Plan />} />
+                <Route path="/result" element={<Result />} />
+                <Route path="/trips"  element={<Trips />} />
+                <Route path="*"       element={<Navigate to="/" replace />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

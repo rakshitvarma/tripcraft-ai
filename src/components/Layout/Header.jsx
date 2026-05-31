@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import Logo from '../Logo'
 
 const NAV = [
   { to: '/',      label: 'Home'      },
@@ -8,27 +9,19 @@ const NAV = [
 
 export default function Header({ dark, onToggleDark, session, onLogout }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-white/20 dark:border-slate-800/60 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-slate-200/60 dark:border-white/[0.06] bg-white/70 dark:bg-black/60 backdrop-blur-xl">
       <nav
-        className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3.5"
+        className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3"
         aria-label="Main navigation"
       >
+        {/* Logo */}
         <NavLink
           to="/"
-          className="flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 rounded-lg group"
+          className="flex items-center gap-2 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 group"
           aria-label="TripCraft home"
         >
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="drop-shadow-md group-hover:scale-110 transition-transform duration-200">
-            <defs>
-              <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#6366f1"/>
-                <stop offset="50%" stopColor="#8b5cf6"/>
-                <stop offset="100%" stopColor="#f43f5e"/>
-              </linearGradient>
-            </defs>
-            <path d="M28 12.5L20 16l-6-8-2 1 3 8.5L9 19l-2-2.5-1.5.5 1.5 4.5L8.5 26l1.5-.5-.5-3 2.5-1.5 5.5 7 2-1-1-9L26 14l2-1.5z" fill="url(#logoGrad)"/>
-          </svg>
-          <span className="text-xl font-extrabold tracking-tight gradient-text">TripCraft</span>
+          <Logo size={26} className="group-hover:scale-110 transition-transform duration-200 drop-shadow-sm" />
+          <span className="text-lg font-extrabold tracking-tight gradient-text">TripCraft</span>
         </NavLink>
 
         <a
@@ -38,8 +31,9 @@ export default function Header({ dark, onToggleDark, session, onLogout }) {
           Skip to content
         </a>
 
+        {/* Nav + controls */}
         <div className="flex items-center gap-1">
-          <ul className="flex items-center gap-1" role="list">
+          <ul className="flex items-center gap-0.5" role="list">
             {NAV.map(({ to, label }) => (
               <li key={to}>
                 <NavLink
@@ -48,8 +42,8 @@ export default function Header({ dark, onToggleDark, session, onLogout }) {
                   className={({ isActive }) =>
                     `rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${
                       isActive
-                        ? 'bg-brand-50 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400 font-semibold'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50/50 dark:hover:bg-slate-800/60'
+                        ? 'text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 font-semibold'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5'
                     }`
                   }
                 >
@@ -59,48 +53,47 @@ export default function Header({ dark, onToggleDark, session, onLogout }) {
             ))}
           </ul>
 
-          {session && (
-            <div className="flex items-center gap-2 ml-1">
-              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-brand-50/80 dark:bg-brand-900/30 border border-brand-200/60 dark:border-brand-700/40 px-3 py-1.5 text-xs font-semibold text-brand-600 dark:text-brand-400">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                {session.username}
-              </span>
-              <button
-                type="button"
-                onClick={onLogout}
-                className="rounded-xl p-2 text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-all duration-150"
-                aria-label="Sign out"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-              </button>
-            </div>
-          )}
-
-          <button
-            type="button"
-            onClick={onToggleDark}
-            aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="ml-2 rounded-xl p-2 text-slate-500 dark:text-slate-400
-                       bg-slate-100/80 dark:bg-slate-800/80
-                       hover:bg-brand-50 dark:hover:bg-slate-700
-                       hover:text-brand-600 dark:hover:text-brand-400
-                       transition-all duration-150
-                       focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500"
-          >
-            {dark ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
+          <div className="ml-2 flex items-center gap-1.5">
+            {/* User chip */}
+            {session && (
+              <>
+                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  {session.username}
+                </span>
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  aria-label="Sign out"
+                  className="rounded-lg p-1.5 text-slate-400 dark:text-slate-500 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400 transition-all duration-150"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </button>
+              </>
             )}
-          </button>
+
+            {/* Dark mode toggle */}
+            <button
+              type="button"
+              onClick={onToggleDark}
+              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+              className="rounded-lg p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-700 dark:hover:text-slate-200 transition-all duration-150"
+            >
+              {dark ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
       </nav>
     </header>

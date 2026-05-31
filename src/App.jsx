@@ -13,7 +13,10 @@ const Trips  = lazy(() => import('./pages/Trips'))
 function PageLoader() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center" role="status" aria-label="Loading page">
-      <div className="h-8 w-8 rounded-full border-4 border-brand-200 border-t-brand-600 animate-spin" />
+      <div className="relative">
+        <div className="h-12 w-12 rounded-full border-4 border-brand-200 border-t-brand-600 animate-spin" />
+        <div className="absolute inset-0 h-12 w-12 rounded-full border-4 border-transparent border-b-violet-500 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }} />
+      </div>
     </div>
   )
 }
@@ -23,19 +26,19 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="flex min-h-screen flex-col transition-colors duration-200">
+      <div className={`flex min-h-screen flex-col transition-colors duration-300 ${dark ? 'bg-mesh-dark' : 'bg-mesh'}`}>
         <Header dark={dark} onToggleDark={() => setDark(d => !d)} />
         <main id="main-content" className="flex-1">
           <ErrorBoundary>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/"        element={<Home />} />
-              <Route path="/plan"    element={<Plan />} />
-              <Route path="/result"  element={<Result />} />
-              <Route path="/trips"   element={<Trips />} />
-              <Route path="*"        element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/"        element={<Home />} />
+                <Route path="/plan"    element={<Plan />} />
+                <Route path="/result"  element={<Result />} />
+                <Route path="/trips"   element={<Trips />} />
+                <Route path="*"        element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
           </ErrorBoundary>
         </main>
         <Footer />

@@ -10,7 +10,8 @@ export default function Trips() {
 
   if (viewing) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-10">
+      <div className="relative mx-auto max-w-3xl px-4 py-10">
+        <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-64 w-96 rounded-full bg-gradient-to-r from-brand-400/15 to-violet-400/15 blur-3xl -z-10" aria-hidden="true" />
         <button
           type="button"
           onClick={() => setViewing(null)}
@@ -36,10 +37,14 @@ export default function Trips() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12">
-      <header className="mb-8 flex items-center justify-between gap-4 flex-wrap">
+    <div className="relative mx-auto max-w-5xl px-4 py-12">
+      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-64 w-96 rounded-full bg-gradient-to-r from-brand-400/15 to-violet-400/15 blur-3xl -z-10" aria-hidden="true" />
+
+      <header className="mb-10 flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">My Trips</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-50">
+            My <span className="gradient-text">Trips</span>
+          </h1>
           <p className="mt-1 text-slate-500 dark:text-slate-400">
             {trips.length} saved {trips.length === 1 ? 'trip' : 'trips'}
           </p>

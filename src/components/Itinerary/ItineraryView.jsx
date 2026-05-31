@@ -2,30 +2,24 @@ import { useMemo, memo } from 'react'
 import DayCard from './DayCard'
 import { formatBudget } from '../../utils/formatters'
 
-/**
- * Renders a single budget category row with a proportional progress bar.
- * Extracted to keep ItineraryView readable and enable targeted memoisation.
- * @param {{ label: string, value: number, total: number, currency: string }} props
- */
 const BudgetRow = memo(function BudgetRow({ label, value, total, currency }) {
   const pct = total > 0 ? Math.round((value / total) * 100) : 0
   return (
     <div className="flex items-center gap-3">
-      <dt className="w-32 shrink-0 text-sm capitalize text-slate-600 dark:text-slate-400">{label}</dt>
-      <div className="flex-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700 h-2" role="presentation">
-        <div className="h-2 rounded-full bg-brand-500 transition-all duration-300" style={{ width: `${pct}%` }} />
+      <dt className="w-32 shrink-0 text-sm capitalize text-slate-600 dark:text-slate-400 font-medium">{label}</dt>
+      <div className="flex-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700/60 h-2.5" role="presentation">
+        <div
+          className="h-2.5 rounded-full bg-gradient-to-r from-brand-500 to-violet-500 transition-all duration-500"
+          style={{ width: `${pct}%` }}
+        />
       </div>
-      <dd className="w-24 text-right text-sm font-medium text-slate-800 dark:text-slate-200">
+      <dd className="w-24 text-right text-sm font-bold text-slate-800 dark:text-slate-200">
         {formatBudget(value, currency)}
       </dd>
     </div>
   )
 })
 
-/**
- * Full itinerary display: hero, day schedule, budget, packing, emergency contacts.
- * @param {{ itinerary: object, onSave: () => void, saved: boolean, currency?: string }} props
- */
 function ItineraryView({ itinerary, onSave, saved, currency = 'USD' }) {
   const {
     destination,
@@ -52,22 +46,25 @@ function ItineraryView({ itinerary, onSave, saved, currency = 'USD' }) {
   )
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Hero */}
       <section
-        className="card bg-gradient-to-br from-brand-600 to-brand-900 text-white"
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 via-violet-600 to-accent-500 text-white shadow-2xl shadow-brand-500/30"
         aria-labelledby="itinerary-heading"
       >
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
+        <div className="relative p-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
-            <h1 id="itinerary-heading" className="text-2xl font-bold">{destination}</h1>
-            <p className="mt-2 text-brand-100 leading-relaxed">{summary}</p>
+            <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1">Your Itinerary</p>
+            <h1 id="itinerary-heading" className="text-3xl font-extrabold">{destination}</h1>
+            <p className="mt-3 text-white/80 leading-relaxed max-w-lg text-sm">{summary}</p>
           </div>
           <button
             type="button"
             onClick={onSave}
             disabled={saved}
-            className="shrink-0 rounded-lg border-2 border-white/40 bg-white/10 px-4 py-2 text-sm font-semibold text-white
+            className="shrink-0 rounded-2xl border-2 border-white/30 bg-white/10 backdrop-blur-sm px-5 py-2.5 text-sm font-bold text-white
                        hover:bg-white/20 active:scale-95 transition-all duration-150
                        disabled:opacity-60 disabled:cursor-not-allowed
                        focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
@@ -80,7 +77,8 @@ function ItineraryView({ itinerary, onSave, saved, currency = 'USD' }) {
 
       {/* Day-by-day schedule */}
       <section aria-labelledby="schedule-heading">
-        <h2 id="schedule-heading" className="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100">
+        <h2 id="schedule-heading" className="mb-4 text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-violet-600 text-xs text-white shadow-sm">📅</span>
           Day-by-Day Schedule
         </h2>
         <div className="space-y-3">
@@ -92,32 +90,35 @@ function ItineraryView({ itinerary, onSave, saved, currency = 'USD' }) {
 
       {/* Budget breakdown */}
       {total > 0 && (
-        <section className="card" aria-labelledby="budget-heading">
-          <h2 id="budget-heading" className="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100">
+        <section className="card-glass" aria-labelledby="budget-heading">
+          <h2 id="budget-heading" className="mb-5 text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-teal-600 text-xs text-white shadow-sm">💰</span>
             Budget Breakdown
           </h2>
-          <dl className="space-y-2">
+          <dl className="space-y-3">
             {budgetEntries.map(([key, val]) => (
               <BudgetRow key={key} label={key} value={val} total={total} currency={currency} />
             ))}
           </dl>
-          <p className="mt-4 text-right text-sm font-bold text-slate-900 dark:text-slate-100">
-            Total estimate: {formatBudget(total, currency)}
-          </p>
+          <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-700/60 text-right">
+            <p className="text-sm text-slate-500 dark:text-slate-400">Total estimate</p>
+            <p className="text-xl font-extrabold gradient-text-subtle">{formatBudget(total, currency)}</p>
+          </div>
         </section>
       )}
 
       {/* Packing & Emergency */}
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         {packingEssentials.length > 0 && (
-          <section className="card" aria-labelledby="packing-heading">
-            <h2 id="packing-heading" className="mb-3 font-semibold text-slate-800 dark:text-slate-100">
-              🎒 Packing Essentials
+          <section className="card-glass" aria-labelledby="packing-heading">
+            <h2 id="packing-heading" className="mb-3 font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 text-xs text-white shadow-sm">🎒</span>
+              Packing Essentials
             </h2>
-            <ul className="space-y-1.5" aria-label="Packing list">
+            <ul className="space-y-2" aria-label="Packing list">
               {packingEssentials.map((item) => (
                 <li key={item} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-                  <span className="h-1.5 w-1.5 rounded-full bg-brand-500 shrink-0" aria-hidden="true" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-brand-500 to-violet-500 shrink-0" aria-hidden="true" />
                   {item}
                 </li>
               ))}
@@ -126,17 +127,18 @@ function ItineraryView({ itinerary, onSave, saved, currency = 'USD' }) {
         )}
 
         {emergencyEntries.length > 0 && (
-          <section className="card" aria-labelledby="emergency-heading">
-            <h2 id="emergency-heading" className="mb-3 font-semibold text-slate-800 dark:text-slate-100">
-              🆘 Emergency Contacts
+          <section className="card-glass" aria-labelledby="emergency-heading">
+            <h2 id="emergency-heading" className="mb-3 font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-red-400 to-rose-600 text-xs text-white shadow-sm">🆘</span>
+              Emergency Contacts
             </h2>
-            <dl className="space-y-1.5 text-sm">
+            <dl className="space-y-2 text-sm">
               {emergencyEntries.map(([key, val]) => (
-                <div key={key} className="flex justify-between">
+                <div key={key} className="flex justify-between items-center">
                   <dt className="capitalize text-slate-500 dark:text-slate-400">
                     {key.replace(/([A-Z])/g, ' $1')}
                   </dt>
-                  <dd className="font-medium text-slate-800 dark:text-slate-200">{val}</dd>
+                  <dd className="font-bold text-slate-800 dark:text-slate-200">{val}</dd>
                 </div>
               ))}
             </dl>

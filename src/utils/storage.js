@@ -1,8 +1,15 @@
-const TRIPS_KEY = 'wander_ai_trips'
+/** localStorage key for persisted trips. */
+const TRIPS_KEY = 'tripcraft_trips'
 
+/**
+ * Cross-environment UUID generator.
+ * Prefers the native Web Crypto API; falls back to Math.random for Jest/jsdom.
+ * @returns {string}
+ */
 function uuid() {
-  // Use native crypto when available (browser + Node ≥ 19), otherwise fallback
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID()
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0
     return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
@@ -11,7 +18,8 @@ function uuid() {
 
 /**
  * Load all saved trips from localStorage.
- * @returns {Array}
+ * Returns an empty array on parse failure or missing data.
+ * @returns {object[]}
  */
 export function loadTrips() {
   try {
@@ -23,33 +31,35 @@ export function loadTrips() {
 }
 
 /**
- * Persist the trips array to localStorage.
- * @param {Array} trips
+ * Persist the full trips array to localStorage.
+ * Fails silently on storage-quota errors so the UI remains functional.
+ * @param {object[]} trips
  */
 export function saveTrips(trips) {
   try {
     localStorage.setItem(TRIPS_KEY, JSON.stringify(trips))
   } catch {
-    // Storage quota exceeded — fail silently; the UI still works in-memory
+    // Quota exceeded — in-memory state is still consistent
   }
 }
 
 /**
- * Append a single trip object and return the updated list.
+ * Prepend a new trip (with generated id + timestamp) and persist.
  * @param {object} trip
- * @returns {Array}
+ * @returns {object[]} Updated trips list
  */
 export function addTrip(trip) {
-  const trips = loadTrips()
-  const updated = [{ ...trip, id: uuid(), savedAt: new Date().toISOString() }, ...trips]
+  const existing = loadTrips()
+  const updated = [{ ...trip, id: uuid(), savedAt: new Date().toISOString() }, ...existing]
   saveTrips(updated)
   return updated
 }
 
 /**
- * Remove a trip by id and return the updated list.
+ * Remove the trip matching `id` and persist.
+ * No-op if the id is not found.
  * @param {string} id
- * @returns {Array}
+ * @returns {object[]} Updated trips list
  */
 export function deleteTrip(id) {
   const updated = loadTrips().filter((t) => t.id !== id)

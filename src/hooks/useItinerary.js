@@ -2,8 +2,16 @@ import { useState, useCallback } from 'react'
 import { generateItinerary } from '../utils/gemini'
 
 /**
- * Manages the async lifecycle of itinerary generation.
- * Returns the generated itinerary plus loading/error state and a generate fn.
+ * Manages async lifecycle of AI itinerary generation.
+ * Exposes stable `generate` and `reset` callbacks to avoid unnecessary re-renders.
+ *
+ * @returns {{
+ *   itinerary: object|null,
+ *   loading: boolean,
+ *   error: string|null,
+ *   generate: (prefs: object) => Promise<object|null>,
+ *   reset: () => void
+ * }}
  */
 export function useItinerary() {
   const [itinerary, setItinerary] = useState(null)

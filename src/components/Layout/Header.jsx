@@ -15,13 +15,20 @@ export default function Header({ dark, onToggleDark }) {
       >
         <NavLink
           to="/"
-          className="flex items-center gap-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 rounded-lg"
+          className="flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 rounded-lg group"
           aria-label="TripCraft home"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-violet-600 shadow-md shadow-brand-500/30">
-            <span className="text-sm" aria-hidden="true">✈️</span>
-          </div>
-          <span className="text-xl font-bold gradient-text">TripCraft</span>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="drop-shadow-md group-hover:scale-110 transition-transform duration-200">
+            <defs>
+              <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#6366f1"/>
+                <stop offset="50%" stopColor="#8b5cf6"/>
+                <stop offset="100%" stopColor="#f43f5e"/>
+              </linearGradient>
+            </defs>
+            <path d="M28 12.5L20 16l-6-8-2 1 3 8.5L9 19l-2-2.5-1.5.5 1.5 4.5L8.5 26l1.5-.5-.5-3 2.5-1.5 5.5 7 2-1-1-9L26 14l2-1.5z" fill="url(#logoGrad)"/>
+          </svg>
+          <span className="text-xl font-extrabold tracking-tight gradient-text">TripCraft</span>
         </NavLink>
 
         <a

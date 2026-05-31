@@ -12,7 +12,7 @@
   }
 
   :root {
-    background-color: #f8f7ff;
+    background-color: #f0eeff;
     color: #1e1b4b;
   }
 
@@ -84,10 +84,11 @@
 
 @layer utilities {
   .bg-mesh {
-    background-image: radial-gradient(at 40% 20%, #e0e7ff 0px, transparent 50%),
+    background-image: radial-gradient(at 40% 20%, #ddd6fe 0px, transparent 50%),
                       radial-gradient(at 80% 0%, #ede9fe 0px, transparent 50%),
-                      radial-gradient(at 0% 50%, #fce7f3 0px, transparent 60%);
-    background-color: #f8f7ff;
+                      radial-gradient(at 0% 60%, #fce7f3 0px, transparent 55%),
+                      radial-gradient(at 60% 80%, #e0e7ff 0px, transparent 50%);
+    background-color: #f0eeff;
   }
 
   .dark .bg-mesh {

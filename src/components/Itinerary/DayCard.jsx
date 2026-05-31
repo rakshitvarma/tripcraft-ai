@@ -24,7 +24,7 @@ function DayCard({ day, defaultOpen = false, currency = 'USD' }) {
   const gradient = DAY_GRADIENTS[(day.day - 1) % DAY_GRADIENTS.length]
 
   return (
-    <article className="card-glass overflow-hidden p-0" aria-label={`Day ${day.day}: ${day.theme}`}>
+    <article className="overflow-hidden rounded-2xl border border-white/40 dark:border-slate-700/60 bg-white/50 dark:bg-slate-800/70 backdrop-blur-md shadow-sm" aria-label={`Day ${day.day}: ${day.theme}`}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -52,7 +52,7 @@ function DayCard({ day, defaultOpen = false, currency = 'USD' }) {
       </button>
 
       {open && (
-        <div id={`day-${day.day}-content`} className="border-t border-white/30 dark:border-slate-700/40 px-6 py-4 space-y-4">
+        <div id={`day-${day.day}-content`} className="border-t border-slate-200/60 dark:border-slate-600/40 bg-white/30 dark:bg-slate-900/30 px-6 py-4 space-y-4">
           <ol className="space-y-4" aria-label={`Activities for day ${day.day}`}>
             {day.activities.map((act, i) => (
               <li key={i} className="flex gap-3">

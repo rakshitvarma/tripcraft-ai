@@ -29,9 +29,7 @@ export default function TripForm() {
   const [errors, setErrors] = useState({})
   const navigate = useNavigate()
 
-  // Use only the city name (before first comma) for weather lookup
-  const weatherCity = form.destination.split(',')[0].trim()
-  const { weather, loading: wLoading, error: wError } = useWeather(weatherCity)
+  const { weather, loading: wLoading, error: wError } = useWeather(form.destination)
   const nights = nightsBetween(form.startDate, form.endDate)
 
   const set = useCallback((field, value) => {
@@ -69,10 +67,16 @@ export default function TripForm() {
         <label htmlFor="destination" className="label-base">
           Destination <span aria-hidden="true" className="text-red-500">*</span>
         </label>
-        <LocationInput
+        <input
+          id="destination"
+          type="text"
+          className="input-base"
+          placeholder="e.g. Tokyo, Japan"
           value={form.destination}
-          onChange={(v) => set('destination', v)}
-          error={errors.destination}
+          onChange={(e) => set('destination', e.target.value)}
+          autoComplete="off"
+          aria-required="true"
+          aria-invalid={!!errors.destination}
         />
         <FieldError msg={errors.destination} />
         {(weather || wLoading || wError) && (

@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useItinerary } from '../hooks/useItinerary'
 import { useTrips } from '../hooks/useTrips'
 import { useWeather } from '../hooks/useWeather'
 import ItineraryView from '../components/Itinerary/ItineraryView'
-import WeatherWidget from '../components/Weather/WeatherWidget'
+
+const WeatherWidget = lazy(() => import('../components/Weather/WeatherWidget'))
 
 function Skeleton() {
   return (
@@ -36,17 +37,17 @@ export default function Result() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function handleSave() {
+  const handleSave = useCallback(() => {
     if (!itinerary || !prefs) return
     save({
       ...prefs,
-      destination: itinerary.destination ?? prefs.destination,
-      summary:     itinerary.summary,
-      days:        itinerary.days,
+      destination:     itinerary.destination ?? prefs.destination,
+      summary:         itinerary.summary,
+      days:            itinerary.days,
       budgetBreakdown: itinerary.budgetBreakdown,
     })
     setSaved(true)
-  }
+  }, [itinerary, prefs, save])
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
@@ -80,8 +81,9 @@ export default function Result() {
 
       {itinerary && !loading && (
         <div className="space-y-8">
-          {/* Weather for destination */}
-          <WeatherWidget weather={weather} loading={wLoading} error={wError} />
+          <Suspense fallback={null}>
+            <WeatherWidget weather={weather} loading={wLoading} error={wError} />
+          </Suspense>
 
           <ItineraryView itinerary={itinerary} onSave={handleSave} saved={saved} currency={prefs?.currency ?? 'USD'} />
         </div>

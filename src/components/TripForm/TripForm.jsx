@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StyleSelector from './StyleSelector'
-import BudgetSlider from './BudgetSlider'
-import { CURRENCIES } from './BudgetSlider'
+import BudgetSlider, { CURRENCIES } from './BudgetSlider'
 import { useWeather } from '../../hooks/useWeather'
-import WeatherWidget from '../Weather/WeatherWidget'
 import { nightsBetween } from '../../utils/formatters'
+
+const WeatherWidget = lazy(() => import('../Weather/WeatherWidget'))
 
 const today = new Date().toISOString().split('T')[0]
 
@@ -32,12 +32,12 @@ export default function TripForm() {
   const { weather, loading: wLoading, error: wError } = useWeather(form.destination)
   const nights = nightsBetween(form.startDate, form.endDate)
 
-  function set(field, value) {
+  const set = useCallback((field, value) => {
     setForm((f) => ({ ...f, [field]: value }))
     setErrors((e) => ({ ...e, [field]: undefined }))
-  }
+  }, [])
 
-  function validate() {
+  const validate = useCallback(() => {
     const e = {}
     if (!form.destination.trim()) e.destination = 'Please enter a destination.'
     if (!form.startDate) e.startDate = 'Select a start date.'
@@ -45,9 +45,9 @@ export default function TripForm() {
     if (form.startDate && form.endDate && form.endDate <= form.startDate)
       e.endDate = 'End date must be after start date.'
     return e
-  }
+  }, [form])
 
-  function handleSubmit(e) {
+  const handleSubmit = useCallback((e) => {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length) {
@@ -57,7 +57,7 @@ export default function TripForm() {
     }
     sessionStorage.setItem('tripPrefs', JSON.stringify(form))
     navigate('/result')
-  }
+  }, [validate, form, navigate])
 
   return (
     <form onSubmit={handleSubmit} noValidate aria-label="Trip preference form" className="space-y-6">
@@ -81,7 +81,9 @@ export default function TripForm() {
         <FieldError msg={errors.destination} />
         {(weather || wLoading || wError) && (
           <div className="mt-3">
-            <WeatherWidget weather={weather} loading={wLoading} error={wError} compact />
+            <Suspense fallback={null}>
+              <WeatherWidget weather={weather} loading={wLoading} error={wError} compact />
+            </Suspense>
           </div>
         )}
       </div>

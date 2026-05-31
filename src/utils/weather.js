@@ -1,16 +1,28 @@
-const BASE = 'https://api.openweathermap.org/data/2.5'
+const BASE_URL = 'https://api.openweathermap.org/data/2.5'
+
+/**
+ * @typedef {object} WeatherData
+ * @property {string} city
+ * @property {string} country
+ * @property {number} tempC
+ * @property {number} feelsLikeC
+ * @property {number} humidity
+ * @property {string} description
+ * @property {string} icon
+ * @property {number} windKph
+ */
 
 /**
  * Fetch current weather for a city name.
- * Throws on non-2xx responses so callers can catch and display errors.
+ * Throws a descriptive Error on non-2xx so callers can surface it in the UI.
  * @param {string} city
- * @returns {Promise<object>} Normalized weather object
+ * @returns {Promise<WeatherData>}
  */
 export async function fetchWeather(city) {
   const key = import.meta.env.VITE_OPENWEATHER_API_KEY
   if (!key) throw new Error('OpenWeatherMap API key not configured')
 
-  const url = `${BASE}/weather?q=${encodeURIComponent(city)}&units=metric&appid=${key}`
+  const url = `${BASE_URL}/weather?q=${encodeURIComponent(city)}&units=metric&appid=${key}`
   const res = await fetch(url)
 
   if (!res.ok) {
@@ -18,19 +30,18 @@ export async function fetchWeather(city) {
     throw new Error(`Weather service error (${res.status})`)
   }
 
-  const data = await res.json()
-  return normalizeWeather(data)
+  return normalizeWeather(await res.json())
 }
 
 /**
- * Map raw OWM response to a stable shape used by the UI.
- * Keeping this separate makes unit testing easy without hitting the API.
- * @param {object} raw
- * @returns {object}
+ * Map a raw OpenWeatherMap response to a stable, minimal shape used by the UI.
+ * Keeping normalisation separate makes unit testing straightforward.
+ * @param {object} raw - Raw OWM /weather response
+ * @returns {WeatherData}
  */
 export function normalizeWeather(raw) {
   return {
-    city:        raw.name,
+    city:        raw.name ?? '',
     country:     raw.sys?.country ?? '',
     tempC:       Math.round(raw.main?.temp ?? 0),
     feelsLikeC:  Math.round(raw.main?.feels_like ?? 0),

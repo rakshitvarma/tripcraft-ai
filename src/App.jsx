@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Header from './components/Layout/Header'
 import Footer from './components/Layout/Footer'
+import ErrorBoundary from './components/ErrorBoundary'
 import { useDarkMode } from './hooks/useDarkMode'
 
 const Home   = lazy(() => import('./pages/Home'))
@@ -25,6 +26,7 @@ export default function App() {
       <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-200">
         <Header dark={dark} onToggleDark={() => setDark(d => !d)} />
         <main id="main-content" className="flex-1">
+          <ErrorBoundary>
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/"        element={<Home />} />
@@ -34,6 +36,7 @@ export default function App() {
               <Route path="*"        element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
+          </ErrorBoundary>
         </main>
         <Footer />
       </div>

@@ -80,26 +80,39 @@ export async function generateItinerary(prefs) {
   const key = import.meta.env.VITE_GEMINI_API_KEY
   if (!key) throw new Error('Gemini API key not configured')
 
-  const res = await fetch(`${GEMINI_URL}?key=${key}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: buildItineraryPrompt(prefs) }] }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 65536 },
-    }),
+  const body = JSON.stringify({
+    contents: [{ parts: [{ text: buildItineraryPrompt(prefs) }] }],
+    generationConfig: {
+      temperature: 0.3,
+      maxOutputTokens: 65536,
+      responseMimeType: 'application/json',
+    },
   })
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(err?.error?.message ?? `Gemini API error (${res.status})`)
+  let lastError
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await fetch(`${GEMINI_URL}?key=${key}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    })
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error(err?.error?.message ?? `Gemini API error (${res.status})`)
+    }
+
+    const data = await res.json()
+    const parts = data?.candidates?.[0]?.content?.parts ?? []
+    // Filter out thinking parts (gemini-2.5-flash with thinking enabled)
+    const allText = parts.filter((p) => !p.thought).map((p) => p.text ?? '').join('\n').trim()
+
+    const parsed = extractJSON(allText)
+    if (parsed) return parsed
+
+    lastError = allText
+    console.warn('[TripCraft] Attempt', attempt + 1, 'raw response:', allText.slice(0, 500))
   }
 
-  const data = await res.json()
-  const parts = data?.candidates?.[0]?.content?.parts ?? []
-  const allText = parts.map((p) => p.text ?? '').join('\n').trim()
-
-  const parsed = extractJSON(allText)
-  if (parsed) return parsed
-
-  throw new Error(`Could not parse AI response. Raw: ${allText.slice(0, 300)}`)
+  throw new Error(`Could not parse AI response. Raw: ${lastError?.slice(0, 300)}`)
 }

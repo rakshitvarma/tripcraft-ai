@@ -1,7 +1,8 @@
 import { useState, lazy, Suspense, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StyleSelector from './StyleSelector'
-import BudgetSlider, { CURRENCIES } from './BudgetSlider'
+import BudgetSlider from './BudgetSlider'
+import LocationInput from './LocationInput'
 import { useWeather } from '../../hooks/useWeather'
 import { nightsBetween } from '../../utils/formatters'
 
@@ -64,19 +65,13 @@ export default function TripForm() {
 
       {/* Destination */}
       <div>
-        <label htmlFor="destination" className="label-base dark:text-slate-300">
+        <label htmlFor="destination" className="label-base">
           Destination <span aria-hidden="true" className="text-red-500">*</span>
         </label>
-        <input
-          id="destination"
-          type="text"
-          className="input-base dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
-          placeholder="e.g. Tokyo, Japan"
+        <LocationInput
           value={form.destination}
-          onChange={(e) => set('destination', e.target.value)}
-          autoComplete="off"
-          aria-required="true"
-          aria-invalid={!!errors.destination}
+          onChange={(v) => set('destination', v)}
+          error={errors.destination}
         />
         <FieldError msg={errors.destination} />
         {(weather || wLoading || wError) && (
@@ -155,7 +150,7 @@ export default function TripForm() {
         </label>
         <textarea
           id="constraints"
-          className="input-base resize-none dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-500"
+          className="input-base resize-none "
           rows={3}
           placeholder="Dietary restrictions, mobility needs, must-see spots, things to avoid…"
           value={form.constraints}

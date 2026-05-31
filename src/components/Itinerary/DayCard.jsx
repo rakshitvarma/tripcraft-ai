@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { formatDate } from '../../utils/formatters'
 
 const TYPE_COLOR = {
@@ -12,7 +12,7 @@ const TYPE_COLOR = {
 /**
  * @param {{ day: object, defaultOpen?: boolean }} props
  */
-export default function DayCard({ day, defaultOpen = false, currency = 'USD' }) {
+function DayCard({ day, defaultOpen = false, currency = 'USD' }) {
   const [open, setOpen] = useState(defaultOpen)
 
   return (
@@ -84,3 +84,5 @@ export default function DayCard({ day, defaultOpen = false, currency = 'USD' }) 
     </article>
   )
 }
+
+export default memo(DayCard)

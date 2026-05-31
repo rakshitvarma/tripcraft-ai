@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import DayCard from './DayCard'
 import { formatBudget } from '../../utils/formatters'
 
@@ -6,7 +7,10 @@ import { formatBudget } from '../../utils/formatters'
  */
 export default function ItineraryView({ itinerary, onSave, saved, currency = 'USD' }) {
   const { destination, summary, days = [], budgetBreakdown = {}, packingEssentials = [], emergencyContacts = {} } = itinerary
-  const total = Object.values(budgetBreakdown).reduce((s, v) => s + (v ?? 0), 0)
+  const total = useMemo(
+    () => Object.values(budgetBreakdown).reduce((s, v) => s + (v ?? 0), 0),
+    [budgetBreakdown],
+  )
 
   return (
     <div className="space-y-8">
